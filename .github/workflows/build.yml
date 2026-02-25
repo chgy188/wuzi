@@ -44,6 +44,15 @@ jobs:
 
     - name: Build APK
       run: |
+        # 如果 buildozer.spec 不存在，创建默认配置
+        if [ ! -f buildozer.spec ]; then
+          buildozer init
+        fi
+        # 从 requirements.txt 更新 buildozer.spec 的 requirements
+        if [ -f requirements.txt ]; then
+          requirements=$(cat requirements.txt | tr '\n' ',' | sed 's/,$//')
+          sed -i "s/^requirements = .*/requirements = python3,$requirements/" buildozer.spec
+        fi
         buildozer android debug
 
     - name: Upload APK
